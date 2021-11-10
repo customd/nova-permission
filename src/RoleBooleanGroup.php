@@ -28,7 +28,7 @@ class RoleBooleanGroup extends BooleanGroup
 
         $options = $roleClass::get()
             ->pluck($labelAttribute ?? 'name', 'name')
-            ->filter(fn($role) => Auth::user()->can('view', RoleModel::where('name', $role)))
+            ->filter(fn($role) => Auth::user()->can('view', RoleModel::where('name', $role)->first()))
             ->toArray();
 
         $this->options($options);
