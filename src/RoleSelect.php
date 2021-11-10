@@ -7,6 +7,7 @@ use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasPermissions;
+use Illuminate\Support\Facades\Auth;
 
 class RoleSelect extends Select
 {
@@ -22,7 +23,10 @@ class RoleSelect extends Select
 
         $roleClass = app(PermissionRegistrar::class)->getRoleClass();
 
-        $options = $roleClass::get()->pluck($labelAttribute ?? 'name', 'name')->toArray();
+        $options = $roleClass::get()
+            ->pluck($labelAttribute ?? 'name', 'name')
+            ->filter(fn($role) => Auth::user()->can('view', RoleModel::where('name', $role)->first()))
+            ->toArray();
 
         $this->options($options);
     }

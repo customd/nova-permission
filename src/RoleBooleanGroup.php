@@ -8,6 +8,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Spatie\Permission\Models\Role as RoleModel;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Traits\HasPermissions;
+use Illuminate\Support\Facades\Auth;
 
 class RoleBooleanGroup extends BooleanGroup
 {
@@ -25,7 +26,10 @@ class RoleBooleanGroup extends BooleanGroup
 
         $roleClass = app(PermissionRegistrar::class)->getRoleClass();
 
-        $options = $roleClass::get()->pluck($labelAttribute ?? 'name', 'name')->toArray();
+        $options = $roleClass::get()
+            ->pluck($labelAttribute ?? 'name', 'name')
+            ->filter(fn($role) => Auth::user()->can('view', RoleModel::where('name', $role)))
+            ->toArray();
 
         $this->options($options);
     }
